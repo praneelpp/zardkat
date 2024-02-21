@@ -8,17 +8,47 @@ Compile the Multiplier2() circuit and verify it against a smart contract verifie
 ```
 pragma circom 2.0.0;
 
-/*This circuit template checks that c is the multiplication of a and b.*/  
-
+/This circuit template checks that c is the multiplication of a and b./  
 template Multiplier2 () {  
+   signal input A;
+   signal input B;
+   signal X;
+   signal Y;
+   signal output Q;
+   component and=AND();
+   component or=OR();
+   component note=NOT();
+   and.a <== A ;
+   and.b <== B ;
+   X <== and.out ;
 
-   // Declaration of signals.  
-   signal input a;  
-   signal input b;  
-   signal output c;  
+   not.in <== B ;
+   Y <== not.out;
 
-   // Constraints.  
-   c <== a * b;  
+   or.a <== X;
+   or.b <== Y;
+   Q <== or.out;
+
+}
+template AND() {
+    signal input a;
+    signal input b;
+    signal output out;
+
+    out <== a*b;
+}
+template OR() {
+    signal input a;
+    signal input b;
+    signal output out;
+
+    out <== a + b - a*b;
+}
+template NOT() {
+    signal input in;
+    signal output out;
+
+    out <== 1 + in - 2*in;
 }
 component main = Multiplier2();
 ```
@@ -103,3 +133,14 @@ npx hardhat newcircuit --name newcircuit
 **determinism**
 > When you recompile the same circuit using the groth16 protocol, even with no changes, this plugin will apply a new final beacon, changing all the zkey output files. This also causes your Verifier contracts to be updated.
 > For development builds of groth16 circuits, we provide the --deterministic flag in order to use a NON-RANDOM and UNSECURE hardcoded entropy (0x000000 by default) which will allow you to more easily inspect and catch changes in your circuits. You can adjust this default beacon by setting the beacon property on a circuit's config in your hardhat.config.js file.
+
+##.ENV File
+
+Create a .env file with your metamask private key -
+```
+private_key=<your-private-key>
+```
+## Authors
+
+Praneel Patel GM
+@praneelpatel88@gmail.com
